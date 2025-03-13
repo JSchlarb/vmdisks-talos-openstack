@@ -1,0 +1,51 @@
+name: Check for Talos Updates
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  check-talos-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Get Current Version
+        run: |
+          if [[ -f "talos-version.txt" ]]; then
+            echo "CURRENT_VERSION=$(cat talos-version.txt)" >> $GITHUB_ENV
+          else
+            echo "Current version file not found!"
+            exit 1
+          fi
+
+      - name: Fetch Latest Talos Release
+        run: |
+          LATEST_VERSION=$(curl -s https://api.github.com/repos/siderolabs/talos/releases/latest | jq -r '.tag_name')
+          echo "LATEST_VERSION=${LATEST_VERSION}" >> $GITHUB_ENV
+
+      - name: Compare Versions
+        id: check_update
+        run: |
+          if [ "$CURRENT_VERSION" != "$LATEST_VERSION" ]; then
+            echo "UPDATE_AVAILABLE=true" >> $GITHUB_ENV
+          else
+            echo "UPDATE_AVAILABLE=false" >> $GITHUB_ENV
+          fi
+
+      - name: Update Version File
+        if: env.UPDATE_AVAILABLE == 'true'
+        run: |
+          echo "$LATEST_VERSION" > talos-version.txt
+
+      - name: Create Pull Request
+        if: env.UPDATE_AVAILABLE == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: update-talos-version
+          title: "Update Talos to ${{ env.LATEST_VERSION }}"
+          body: "A new version of Talos (${{ env.LATEST_VERSION }}) is available. This PR updates talos-version.txt."
+          commit-message: "Update Talos version to ${{ env.LATEST_VERSION }}"
+          base: main
