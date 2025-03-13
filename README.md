@@ -1,10 +1,12 @@
-# Talos Image Openstack
+# VM Disk Talos OpenStack
 
 ## Overview
 
-This repository provides a configuration for building a containerized Talos image cache, enabling faster provisioning of
-Talos-based clusters in a homelab environment. By leveraging the image caching feature introduced in Talos 1.8, this
-setup reduces dependency on external registries.
+This repository provides a containerized Talos OpenStack image intended for use in a registry with Talos’ new image
+cache feature (available since Talos v1.9.0). It enables faster provisioning of KubeVirt Talos-based clusters in a
+homelab environment by reducing dependency on external registries. This image is particularly effective when used in
+combination with Cluster API (CAPI), KubeVirt, and KubeVirt’s Containerized Data Importer (CDI), as using the
+`pullMethod: node` option minimizes pull traffic by fetching the image from the node's local cache.
 
 ## Talos Base Image Details
 
@@ -44,7 +46,8 @@ spec:
                   storageClassName: ""
                 source:
                   registry:
-                    url: docker://ghcr.io/jschlarb/vmdisks/talos-openstack:v1.9.4-amd64
+                    pullMethod: node # that the cool thing btw
+                    url: docker://ghcr.io/jschlarb/vmdisks/talos-openstack:v1.9.5-amd64
                     #  or arm builds
                     # url: docker://ghcr.io/jschlarb/vmdisks/talos-openstack:v1.9.4-arm64 
 # [...]
@@ -66,7 +69,7 @@ docker buildx build --push --platform linux/${TALOS_ARCH} \
 ## License
 
 This repository contains only configuration files and does **not** include a license. However, the generated artifacts (
-Docker images) incorporate official Talos system images and are subject to
+container images) incorporate official Talos system images and are subject to
 the [Talos License](https://github.com/siderolabs/talos/blob/main/LICENSE).
 
 ## Further Reading
