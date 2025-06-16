@@ -1,5 +1,6 @@
-FROM alpine:3.21.3
+FROM alpine:latest
 
+# renovate: datasource=github-releases depName=talos packageName=siderolabs/talos
 ARG TALOS_VERSION=v1.9.5
 ARG TALOS_ARCH=amd64
 

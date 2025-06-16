@@ -35,7 +35,7 @@ jobs:
       - name: Convert repository name to lowercase
         run: |
           echo "GITHUB_REPOSITORY_OWNER_LC=${GITHUB_REPOSITORY_OWNER@L}" >> "${GITHUB_ENV}"
-          echo "TALOS_VERSION=$(cat talos-version.txt)" >> "${GITHUB_ENV}"
+          echo "TALOS_VERSION=$(grep -Po '(?<=TALOS_VERSION=).*' Dockerfile)" >> "${GITHUB_ENV}"
 
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v5
@@ -44,6 +44,5 @@ jobs:
           push: true
           platforms: linux/${{ matrix.arch }}
           build-args: |
-            TALOS_VERSION=${{ env.TALOS_VERSION }}
             TALOS_ARCH=${{ matrix.arch }}
           tags: ghcr.io/${{ env.GITHUB_REPOSITORY_OWNER_LC }}/vmdisks/talos-openstack:${{ env.TALOS_VERSION }}-${{ matrix.arch }}
