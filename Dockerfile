@@ -1,7 +1,7 @@
 FROM alpine:latest
 
 # renovate: datasource=github-releases depName=talos packageName=siderolabs/talos
-ARG TALOS_VERSION=v1.12.1
+ARG TALOS_VERSION=v1.12.2
 ARG TALOS_ARCH=amd64
 
 RUN apk add xz curl
